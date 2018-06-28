@@ -1,3 +1,4 @@
+import random
 import requests
 from fake_useragent import UserAgent
 from lxml import etree
@@ -83,10 +84,7 @@ def get_pages(url, pagelist):
 
 
 def pg_list():
-    #     pass
-    #
-    #
-    # def main():
+
     '''
     1.各地首页列表
     2.各地租房页列表
@@ -95,9 +93,12 @@ def pg_list():
     '''
     f = open('all_page.json', encoding='utf-8')
     ALL_page = json.load(f)
-    index_list = get_in_pg()
+    index_list = json.load(open('index_list.json', encoding='utf-8'))
+    random.shuffle(index_list)
+    print(index_list)
     # 首页列表获得各地首页
     for i in index_list:
+        print(i)
         print('-------------------001-------------------')
         i = i.strip()
         # print(i)
@@ -128,8 +129,16 @@ def pg_list():
                     jstr = json.dumps(ALL_page, ensure_ascii=False, indent=1)
                     IO3.rtfile_input(jstr, 'all_page.json')
             print('*' * 30 + '\r\n')
+            index_list.remove(i)
+            print('处理完毕，此地址从列表中除去%s' % i)
+            jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
+            IO3.rtfile_input(jstr, 'index_list.json')
             time.sleep(numpy.random.randint(3, 10))
         else:
+            index_list.remove(i)
+            print('废弃，此地址从列表中除去%s' % i)
+            jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
+            IO3.rtfile_input(jstr, 'index_list.json')
             time.sleep(numpy.random.randint(3, 7))
 
     return ALL_page

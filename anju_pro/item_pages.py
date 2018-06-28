@@ -1,6 +1,3 @@
-import requests
-from fake_useragent import UserAgent
-from lxml import etree
 import numpy
 import time
 import IO3
