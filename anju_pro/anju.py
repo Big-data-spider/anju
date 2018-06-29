@@ -6,6 +6,21 @@ import numpy
 import time
 import IO3
 import json
+import re
+
+
+def regx(key, pattern):
+    # 正则匹配
+    pattern1 = re.compile(pattern)
+    matcher1 = re.search(pattern1, key)
+
+    if matcher1 == None:
+        # print(None)
+        return None
+    else:
+        res = matcher1.group(0)
+        # print(res)
+        return res
 
 
 def get_content(url):
@@ -47,19 +62,39 @@ def get_in_pg():
 
 def get_zfpg(url):
     '''
+    有些房产租房信息不在此标签内，使用正则匹配即可
     获取各地租房页
     :param url:
     :return:
     '''
     texts, dom = get_content(url)
-    if len(dom.xpath('//*[@id="glbNavigation"]/div/ul/li[4]/a/@href')) != 0:
-        zu_url = dom.xpath('//*[@id="glbNavigation"]/div/ul/li[4]/a/@href')
-        print(zu_url[0])
-        print('*' * 30)
-        return zu_url[0]
+    # if len(dom.xpath('//*[@id="glbNavigation"]/div/ul/li[4]/a/@href')) != 0:
+    #     zu_url = dom.xpath('//*[@id="glbNavigation"]/div/ul/li[4]/a/@href')
+    #     print(zu_url[0])
+    #     print('*' * 30)
+    #     return zu_url[0]
+    # else:
+    #     print('%s这里没租房信息么？打开看一下' % url)
+    #     time.sleep(numpy.random.randint(3, 6))
+    #     return None
+
+    if len(dom.xpath('//a[@class="a_navnew"]/@href')) != 0:
+        top_list = dom.xpath('//a[@class="a_navnew"]/@href')
+        # print(top_list)
+        for keys in top_list:
+            keys = keys.strip()
+            # print(keys + '\t___sign001')
+            # print(type(keys))
+            patrn = r'(https\:\/\/\w+\.zu\.anjuke\.com)'
+            if regx(keys, patrn) != None:
+                zu_url = regx(keys, patrn)
+                # print(zu_url)
+                return zu_url
+            # else:
+            #     print('抱歉没有租房分类，下一个')
+            #     return None
     else:
-        print('%s这里没租房信息么？打开看一下' % url)
-        time.sleep(numpy.random.randint(3, 6))
+        print('%s抱歉没有找到租房分类，检查一下，然后下一个' % url)
         return None
 
 
@@ -84,7 +119,6 @@ def get_pages(url, pagelist):
 
 
 def pg_list():
-
     '''
     1.各地首页列表
     2.各地租房页列表
@@ -123,6 +157,7 @@ def pg_list():
                 print('-------------------003-------------------')
                 k = k.strip()
                 # print(type(k))
+                # 判断是否加入页面列表
                 if k not in ALL_page:
                     ALL_page.append(k)
                     print(ALL_page)
