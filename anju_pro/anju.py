@@ -78,6 +78,7 @@ def get_zfpg(url):
     #     time.sleep(numpy.random.randint(3, 6))
     #     return None
 
+    # 解决上版本代码会识别不了在第三顺位的租房链接获取错误的问题
     if len(dom.xpath('//a[@class="a_navnew"]/@href')) != 0:
         top_list = dom.xpath('//a[@class="a_navnew"]/@href')
         # print(top_list)
@@ -104,18 +105,24 @@ def get_pages(url, pagelist):
     :param url:
     :return:
     '''
-    texts, dom = get_content(url)
-    if len(dom.xpath('//a[@class="aNxt"]/@href')) != 0:
-        next_page = dom.xpath('//a[@class="aNxt"]/@href')
-        next_url = next_page[0]
-        print(next_url + '       ---------->added')
-        pagelist.append(next_url)
-        time.sleep(numpy.random.randint(3, 6))
-        return get_pages(next_url, pagelist)
-    else:
-        print(pagelist)
-        print('*' * 30)
-        return pagelist
+    try:
+        texts, dom = get_content(url)
+        if len(dom.xpath('//a[@class="aNxt"]/@href')) != 0:
+            next_page = dom.xpath('//a[@class="aNxt"]/@href')
+            next_url = next_page[0]
+            print(next_url + '       ---------->added')
+            pagelist.append(next_url)
+            time.sleep(numpy.random.randint(3, 6))
+            return get_pages(next_url, pagelist)
+        else:
+            print(pagelist)
+            print('*' * 70)
+            return pagelist
+    except:
+
+        print('貌似网络中断了一下？那休息一下吧')
+        time.sleep(numpy.random.randint(5, 10))
+        return None
 
 
 def pg_list():
@@ -128,53 +135,57 @@ def pg_list():
     f = open('all_page.json', encoding='utf-8')
     ALL_page = json.load(f)
     index_list = json.load(open('index_list.json', encoding='utf-8'))
-    random.shuffle(index_list)
-    print(index_list)
-    # 首页列表获得各地首页
-    for i in index_list:
-        print(i)
-        print('-------------------001-------------------')
-        i = i.strip()
-        # print(i)
-        # print(type(i))
-        i = i.replace(' ', '')
-        city_pg = get_zfpg(i)
-        print(city_pg)
-        if city_pg != None:
-            # if city_pg not in ALL_page:
-            # 获得租房页
-            # for j in city_pglist:
-            # print(type(j))
-            # print(j)
-            print('-------------------002-------------------')
-            city_pg = city_pg.replace(' ', '')
-            pg_list = [city_pg]
-            # 获得分页列表
-            pages = get_pages(city_pg, pg_list)
-            print(pages)
-            # 分页列表加入全部列表
-            for k in pages:
-                print('-------------------003-------------------')
-                k = k.strip()
-                # print(type(k))
-                # 判断是否加入页面列表
-                if k not in ALL_page:
-                    ALL_page.append(k)
-                    print(ALL_page)
-                    jstr = json.dumps(ALL_page, ensure_ascii=False, indent=1)
-                    IO3.rtfile_input(jstr, 'all_page.json')
-            print('*' * 30 + '\r\n')
-            index_list.remove(i)
-            print('处理完毕，此地址从列表中除去%s' % i)
-            jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
-            IO3.rtfile_input(jstr, 'index_list.json')
-            time.sleep(numpy.random.randint(3, 10))
-        else:
-            index_list.remove(i)
-            print('废弃，此地址从列表中除去%s' % i)
-            jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
-            IO3.rtfile_input(jstr, 'index_list.json')
-            time.sleep(numpy.random.randint(3, 7))
+    if index_list != None:
+        random.shuffle(index_list)
+        print(index_list)
+        # 首页列表获得各地首页
+        for i in index_list:
+            print(i)
+            print('-------------------001-------------------')
+            i = i.strip()
+            # print(i)
+            # print(type(i))
+            i = i.replace(' ', '')
+            city_pg = get_zfpg(i)
+            print(city_pg)
+            if city_pg != None:
+                # if city_pg not in ALL_page:
+                # 获得租房页
+                # for j in city_pglist:
+                # print(type(j))
+                # print(j)
+                print('-------------------002-------------------')
+                city_pg = city_pg.replace(' ', '')
+                pg_list = [city_pg]
+                # 获得分页列表
+                pages = get_pages(city_pg, pg_list)
+                if pages != None:
+
+                    print(pages)
+                    # 分页列表加入全部列表
+
+                    for k in pages:
+                        print('-------------------003-------------------')
+                        k = k.strip()
+                        # print(type(k))
+                        # 判断是否加入页面列表
+                        if k not in ALL_page:
+                            ALL_page.append(k)
+                            print(ALL_page)
+                            jstr = json.dumps(ALL_page, ensure_ascii=False, indent=1)
+                            IO3.rtfile_input(jstr, 'all_page.json')
+                    print('*' * 70 + '\r\n')
+                    index_list.remove(i)
+                    print('处理完毕，此地址从列表中除去%s' % i)
+                    jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
+                    IO3.rtfile_input(jstr, 'index_list.json')
+                    time.sleep(numpy.random.randint(3, 10))
+            else:
+                index_list.remove(i)
+                print('废弃，此地址从列表中除去%s' % i)
+                jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
+                IO3.rtfile_input(jstr, 'index_list.json')
+                time.sleep(numpy.random.randint(3, 7))
 
     return ALL_page
 
