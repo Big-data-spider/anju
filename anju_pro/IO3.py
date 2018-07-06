@@ -27,7 +27,7 @@ def rtfile(content):
     :return:
     '''
     try:
-        fd = open(filename(), 'w',encoding='utf-8')
+        fd = open(filename(), 'w', encoding='utf-8')
         try:
             fd.write(content)
 
@@ -92,5 +92,23 @@ def readfile():
     except IOError:
         print('open error')
 
-
     return all_text
+
+
+def rtfile_time_with_path(content, sufx):
+    '''
+    保存内容
+    :param content:
+    :return:
+    '''
+    try:
+        fd = open(('./res/' + time_now() + '.' + sufx), 'w',encoding='utf-8')
+        try:
+            fd.write(content)
+
+        finally:
+            fd.close()
+
+    except IOError:
+        print
+        "file not there"

@@ -1,6 +1,8 @@
 from selenium import webdriver
 from lxml import etree
 import time
+import numpy
+import get_city_info
 
 '''
 xpath
@@ -76,93 +78,120 @@ def get_info(url):
     print('#' * 35 + 'OK' + '#' * 35)
 
     # 判断有没有需要点击的事件
-    content = driver.page_source
-    dom = etree.HTML(content)
-    if len(dom.xpath('//div[@class="card-phone-click"]')) != 0:
-        elem = driver.find_element_by_xpath('//div[@class="card-phone-click"]')
-        elem.click()
-    if len(dom.xpath('//li[class="peitao-item peitao-item-more"]')) != 0:
-        elem = driver.find_element_by_xpath('//li[class="peitao-item peitao-item-more"]')
-        elem.click()
-    time.sleep(5)
-    # 新的源码
-    con_reget = driver.page_source
-    dom_reget = etree.HTML(con_reget)
+    try:
+        content = driver.page_source
+        dom = etree.HTML(content)
+        if len(dom.xpath('//div[@class="card-phone-click"]')) != 0:
+            elem = driver.find_element_by_xpath('//div[@class="card-phone-click"]')
+            elem.click()
+        if len(dom.xpath('//li[class="peitao-item peitao-item-more"]')) != 0:
+            elem = driver.find_element_by_xpath('//li[class="peitao-item peitao-item-more"]')
+            elem.click()
+        time.sleep(5)
+        # 新的源码
+        con_reget = driver.page_source
+        dom_reget = etree.HTML(con_reget)
 
-    # city, district, title, rental_type, phone_num, contacts, url_now, rent, lease, area, heading, community, address, detail, facility, advantage, pic
+        # city, district, title, rental_type, phone_num, contacts, url_now, rent, lease, area, heading, community, address, detail, facility, advantage, pic
 
-    # 城市名
-    cityname = dom_reget.xpath('//div[@id="switch_apf_id_5"]/text()')
-    city = cityname[0].replace('\n', '').replace(' ', '')
-    print(city)
+        # 城市名
+        cityname = dom_reget.xpath('//div[@id="switch_apf_id_5"]/text()')
+        city = cityname[0].replace('\n', '').replace(' ', '')
+        # 写入临时文件方便取用
+        # fd = open('./work_file/city_name_temp.txt', 'w')
+        # fd.write(city)
+        # fd.close()
+        print(city)
 
-    district = dom_reget.xpath('//li[@class="house-info-item l-width"]/a/text()')[0]
-    print(district)
+        district = dom_reget.xpath('//li[@class="house-info-item l-width"]/a/text()')[0]
+        print(district)
 
-    title = dom_reget.xpath('//h3[@class="house-title"]/text()')[0]
-    print(title)
+        title = dom_reget.xpath('//h3[@class="house-title"]/text()')[0]
+        print(title)
 
-    rental_type = '请咨询联系人'
-    print(rental_type)
+        rental_type = '请咨询联系人'
+        print(rental_type)
 
-    phone_num = dom_reget.xpath('//div[@class="card-phone-click phone-hover"]/span/text()')[0]
-    print(phone_num)
+        phone_num = dom_reget.xpath('//div[@class="card-phone-click phone-hover"]/span/text()')[0]
+        print(phone_num)
 
-    contacts = dom_reget.xpath('//h2[@class="broker-name"]/text()')[0]
-    print(contacts)
+        contacts = dom_reget.xpath('//h2[@class="broker-name"]/text()')[0]
+        print(contacts)
 
-    url_now = url
-    print(url_now)
+        url_now = url
+        print(url_now)
 
-    rent = dom_reget.xpath('//span[@class="price"]/em/text()')[0]
-    print(rent)
+        rent = dom_reget.xpath('//span[@class="price"]/em/text()')[0]
+        print(rent)
 
-    lease = dom_reget.xpath('//span[@class="type"]/text()')[0]
-    print(lease)
+        lease = dom_reget.xpath('//span[@class="type"]/text()')[0]
+        print(lease)
 
-    area = dom_reget.xpath('//li[@class="house-info-item l-width"]/span[2]/text()')
-    heading = dom_reget.xpath('//li[@class="house-info-item"]/span[2]/text()')
-    areas = area[0] + '\t' + heading[0]
-    headings = area[1] + '\t' + heading[1]
+        area = dom_reget.xpath('//li[@class="house-info-item l-width"]/span[2]/text()')
+        heading = dom_reget.xpath('//li[@class="house-info-item"]/span[2]/text()')
+        areas = area[0] + '\t' + heading[0]
+        headings = area[1] + '\t' + heading[1]
 
-    print(areas)
-    print(headings)
+        print(areas)
+        print(headings)
 
-    community = dom_reget.xpath('//li[@class="house-info-item l-width"]/a[1]/text()')[0]
-    print(community)
+        community = dom_reget.xpath('//li[@class="house-info-item l-width"]/a[1]/text()')[0]
+        print(community)
 
-    address = '请咨询联系人'
-    print(address)
+        address = '请咨询联系人'
+        print(address)
 
-    detail = dom_reget.xpath('//div[@class="auto-general"]/text()')
-    if len(detail) == 1:
-        detail = detail
-        # print(detail)
-    elif len(detail) > 1:
-        detail = dom_reget.xpath('//div[@class="auto-general"]/*/text()')
-        new_list = []
-        for strs in detail:
-            new_strs = strs.replace('\n', '').replace(' ', '').replace('，','').replace('\t','')
-            new_list.append(new_strs)
-            detail = new_list
-    else:
-        detail = '未提供描述'
-    print(detail)
+        detail = dom_reget.xpath('//div[@class="auto-general"]/text()')
+        if len(detail) == 1:
+            detail = detail
+            # print(detail)
+        elif len(detail) > 1:
+            detail = dom_reget.xpath('//div[@class="auto-general"]/*/text()')
+            new_list = []
+            for strs in detail:
+                new_strs = strs.replace('\n', '').replace(' ', '').replace('，', '').replace('\t', '')
+                new_list.append(new_strs)
+                detail = new_list
+        else:
+            detail = '未提供描述'
+        print(detail)
 
-    facility = dom_reget.xpath('//li[@class="peitao-item has"]/div/text()')
-    if len(facility) != 0:
-        facility = facility
-    else:
-        facility = '业主未提供此方面的信息'
-    print(facility)
+        facility = dom_reget.xpath('//li[@class="peitao-item has"]/div/text()')
+        if len(facility) != 0:
+            facility = facility
+        else:
+            facility = '业主未提供此方面的信息'
+        print(facility)
 
-    advantage = '未添加描述'
-    print(advantage)
+        advantage = '未添加描述'
+        print(advantage)
 
-    pic = dom_reget.xpath('//div[@class="img_wrap"]/img/@data-src')
-    print(pic)
+        pic = dom_reget.xpath('//div[@class="img_wrap"]/img/@data-src')
+        print(pic)
 
-    return city, district, title, rental_type, phone_num, contacts, url_now, rent, lease, area, heading, community, address, detail, facility, advantage, pic
+        # 得到处理后城市名
+        c_name = city.replace(' ', '')
+        # 所在地区和省份
+        region, province = get_city_info.get_result(c_name)
+
+        driver.close()
+        driver.quit()
+
+        return city, district, title, rental_type, phone_num, contacts, url_now, rent, lease, area, heading, community, address, detail, facility, advantage, pic, region, province
+    except:
+        print('没有按照预期情况得获得页面元素%s' % url)
+        return None
+        time.sleep(numpy.random.randint(3,6))
+
+
+def get_cname():
+    fd = open('./work_file/city_name_temp.txt', 'r')
+    all_text = fd.read()
+    fd.close()
+    city_name = all_text
+    city_name = city_name.replace(' ', '')
+
+    return city_name
 
 # url = 'https://yan.zu.anjuke.com/fangyuan/1164176099?from=Filter_8'
 #

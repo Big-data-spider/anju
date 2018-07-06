@@ -55,7 +55,7 @@ def get_in_pg():
     print('*' * 30)
 
     in_list = json.dumps(index_list, ensure_ascii=False, indent=1)
-    IO3.rtfile_input(in_list, 'index_list.json')
+    IO3.rtfile_input(in_list, './work_file/index_list.json')
     # 首页列表
     return index_list
 
@@ -119,7 +119,6 @@ def get_pages(url, pagelist):
             print('*' * 70)
             return pagelist
     except:
-
         print('貌似网络中断了一下？那休息一下吧')
         time.sleep(numpy.random.randint(5, 10))
         return None
@@ -132,9 +131,9 @@ def pg_list():
     3.所有分页链接列表
     :return:
     '''
-    f = open('all_page.json', encoding='utf-8')
+    f = open('./work_file/all_page.json', encoding='utf-8')
     ALL_page = json.load(f)
-    index_list = json.load(open('index_list.json', encoding='utf-8'))
+    index_list = json.load(open('./work_file/index_list.json', encoding='utf-8'))
     if index_list != None:
         random.shuffle(index_list)
         print(index_list)
@@ -173,18 +172,18 @@ def pg_list():
                             ALL_page.append(k)
                             print(ALL_page)
                             jstr = json.dumps(ALL_page, ensure_ascii=False, indent=1)
-                            IO3.rtfile_input(jstr, 'all_page.json')
+                            IO3.rtfile_input(jstr, './work_file/all_page.json')
                     print('*' * 70 + '\r\n')
                     index_list.remove(i)
                     print('处理完毕，此地址从列表中除去%s' % i)
                     jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
-                    IO3.rtfile_input(jstr, 'index_list.json')
+                    IO3.rtfile_input(jstr, './work_file/index_list.json')
                     time.sleep(numpy.random.randint(3, 10))
             else:
                 index_list.remove(i)
                 print('废弃，此地址从列表中除去%s' % i)
                 jstr = json.dumps(index_list, ensure_ascii=False, indent=1)
-                IO3.rtfile_input(jstr, 'index_list.json')
+                IO3.rtfile_input(jstr, './work_file/index_list.json')
                 time.sleep(numpy.random.randint(3, 7))
 
     return ALL_page
@@ -197,7 +196,7 @@ def save():
     '''
     lis = pg_list()
     lis = json.dumps(lis, ensure_ascii=False, indent=1)
-    IO3.rtfile_input(lis, 'page_list.json')
+    IO3.rtfile_input(lis, './work_file/page_list.json')
 
 
 save()
