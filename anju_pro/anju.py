@@ -68,15 +68,6 @@ def get_zfpg(url):
     :return:
     '''
     texts, dom = get_content(url)
-    # if len(dom.xpath('//*[@id="glbNavigation"]/div/ul/li[4]/a/@href')) != 0:
-    #     zu_url = dom.xpath('//*[@id="glbNavigation"]/div/ul/li[4]/a/@href')
-    #     print(zu_url[0])
-    #     print('*' * 30)
-    #     return zu_url[0]
-    # else:
-    #     print('%s这里没租房信息么？打开看一下' % url)
-    #     time.sleep(numpy.random.randint(3, 6))
-    #     return None
 
     # 解决上版本代码会识别不了在第三顺位的租房链接获取错误的问题
     if len(dom.xpath('//a[@class="a_navnew"]/@href')) != 0:
@@ -91,9 +82,7 @@ def get_zfpg(url):
                 zu_url = regx(keys, patrn)
                 # print(zu_url)
                 return zu_url
-            # else:
-            #     print('抱歉没有租房分类，下一个')
-            #     return None
+
     else:
         print('%s抱歉没有找到租房分类，检查一下，然后下一个' % url)
         return None
@@ -142,17 +131,11 @@ def pg_list():
             print(i)
             print('-------------------001-------------------')
             i = i.strip()
-            # print(i)
-            # print(type(i))
             i = i.replace(' ', '')
             city_pg = get_zfpg(i)
             print(city_pg)
             if city_pg != None:
-                # if city_pg not in ALL_page:
                 # 获得租房页
-                # for j in city_pglist:
-                # print(type(j))
-                # print(j)
                 print('-------------------002-------------------')
                 city_pg = city_pg.replace(' ', '')
                 pg_list = [city_pg]
@@ -166,7 +149,7 @@ def pg_list():
                     for k in pages:
                         print('-------------------003-------------------')
                         k = k.strip()
-                        # print(type(k))
+
                         # 判断是否加入页面列表
                         if k not in ALL_page:
                             ALL_page.append(k)
@@ -194,9 +177,14 @@ def save():
     存储
     :return:
     '''
-    lis = pg_list()
-    lis = json.dumps(lis, ensure_ascii=False, indent=1)
-    IO3.rtfile_input(lis, './work_file/page_list.json')
+    try:
+        lis = pg_list()
+        lis = json.dumps(lis, ensure_ascii=False, indent=1)
+        IO3.rtfile_input(lis, './work_file/page_list.json')
+    except:
+        print('缓一会继续吧')
+        time.sleep(15)
+        save()
 
 
 save()

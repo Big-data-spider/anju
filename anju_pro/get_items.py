@@ -92,15 +92,9 @@ def get_info(url):
         con_reget = driver.page_source
         dom_reget = etree.HTML(con_reget)
 
-        # city, district, title, rental_type, phone_num, contacts, url_now, rent, lease, area, heading, community, address, detail, facility, advantage, pic
-
         # 城市名
         cityname = dom_reget.xpath('//div[@id="switch_apf_id_5"]/text()')
         city = cityname[0].replace('\n', '').replace(' ', '')
-        # 写入临时文件方便取用
-        # fd = open('./work_file/city_name_temp.txt', 'w')
-        # fd.write(city)
-        # fd.close()
         print(city)
 
         district = dom_reget.xpath('//li[@class="house-info-item l-width"]/a/text()')[0]
