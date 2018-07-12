@@ -7,7 +7,6 @@ import write_dbs
 import random
 import os
 
-
 '''
 1.从文件获取页码列表
 2.从页码地址获取房源列表
@@ -37,12 +36,14 @@ def get_finish_list():
 
             # 准确获取一个txt的位置，利用字符串的拼接
             txt_path = path + file
-            files = open(txt_path, 'r')
+            files = open(txt_path, 'r', encoding='utf-8')
             try:
-                texts = files.read()
+                texts = str(files.read())
+                dict_s = json.load(texts)
             except:
-                pass
-            dict_s = json.loads(texts)
+                # texts = files.read()
+                dict_s = json.load(files)
+            # dict_s = json.loads(files)
             files.close()
             url = dict_s["url_now"]
             url = str(url)
@@ -50,7 +51,7 @@ def get_finish_list():
             json_list.append(dict_s)
 
     jStr = json.dumps(json_list, ensure_ascii=False, indent=1)
-    fd = open('One.json', 'w')
+    fd = open('One.json', 'w', encoding='utf-8')
     fd.write(jStr)
     fd.close()
     print(done_list)
@@ -64,14 +65,14 @@ def step_one():
     :return:
     '''
     try:
-        # 获取列表
+    # 获取列表
         file = open('./work_file/page_list.json', 'r')
         jstr = file.read()
         page_list = json.loads(jstr)
         # 去重
         page_list = list(set(page_list))
         # 获取完成列表
-        fin_list = get_finish_list()
+        # fin_list = get_finish_list()
         # print(page_list)
         # 遍历获取房源列表
         random.shuffle(page_list)
@@ -80,8 +81,10 @@ def step_one():
             it_pglist = item_pages.get_itpg_url(urls)
             # 遍历获取房源信息
             for url2 in it_pglist:
-                # 判断是否采集过
-                if url2 not in fin_list:
+                # 判断是否在数据库里
+                if write_dbs.data_check(url2) != True:
+                    # 判断是否采集过
+                    # if url2 not in fin_list:
                     # 判断数据异常不操作
                     if get_items.get_info(url2) != None:
                         print('#' * 35 + '信息不在已完成列表' + '#' * 35)

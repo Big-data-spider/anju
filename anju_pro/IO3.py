@@ -102,7 +102,7 @@ def rtfile_time_with_path(content, sufx):
     :return:
     '''
     try:
-        fd = open(('./res/' + time_now() + '.' + sufx), 'w',encoding='utf-8')
+        fd = open(('./res/' + time_now() + '.' + sufx), 'w', encoding='utf-8')
         try:
             fd.write(content)
 
