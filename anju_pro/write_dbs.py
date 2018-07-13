@@ -77,6 +77,6 @@ def db_chck():
 def main():
     while True:
         db_chck()
-        time.sleep(1800)
+        time.sleep(60)
 
 # main()
